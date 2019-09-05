@@ -1,0 +1,62 @@
+## 接口文档
+
+## 环境准备：
+### StreamNet环境，配置和启动请参照项目Readme,端口设置为14700
+### Go client环境， 请参照Go官方文档配置好Go运行环境。
+  1. 启动
+    ```
+    cd ~/StreamNet/scripts/front_end/server
+    go run main.go -host http://{ip/host}:14700
+    ```
+
+### AddNode接口文档
+AuthSign: 权限签名，请登陆权限服务端获取；
+sign：请求参数签名方法
+1. 构造 attester，attestee，score, time, nonce, address参数的对象，并序列化成json字符串，按字母从小到大排序（json.marsle方法自带)，
+2. 使用sha256对以上字符串进行散列得到字符串message;
+3. 登陆权限服务器获取sk, address;
+3. 并使用signmessage.sign_input_message方法对以上message进行签名
+
+请求链接：http://localhost:8000/AddNode
+请求参数：
+
+|field | type | remark |
+| -- | --| --|
+|Attester | string |  |
+|Attestee | string | attestee |
+|Score | string | string of numberic, may be any int |
+|Time   | string | string of timestamp |
+|Nonce  | string | string of a int, generate by random|
+|Address | string | generate by privilege server|
+|Sign  | string | sign of attester,attestee,score,time,nonce,address with sort
+|AuthSign | string | sign of address, using for validate privilege|
+
+
+请求示例:
+```
+curl -s http://localhost:8000/AddNode -X POST -H "Content-Type: application/json" -d "{\"Attester\":\"10.0.0.1\",\"Attestee\":\"10.0.0.2\",\"Score\":1,\"Time\":\"2213223190\",\"Nonce\":1,\"Address\":\"1vofXj4Vf2cgJDQrbbN2Zc6gG9qmRmk96\",\"Sign\":\"H7PRixGEiR/EbFkLb5ZPR0vT4dwyo6RipNicjyiT7zE1dT2wggyosSlsPeKLvAMOmi3Tcr6enfbHrRNYkfUEJRo=\"}"
+```
+
+
+### queryNode接口文档
+请求链接：http://localhost:8000/queryNodes
+请求参数：
+|field | type | remark
+|--|--|--|
+|period | int | all blocks is divide into periods per 100 count
+|numrank | int | retrive how many blocks in one query
+|address | string | generate by privilege server
+|AuthSign | string | sign of address, using for validate privilege
+
+示例：
+```
+curl -s http://localhost:8001/QueryNodes -X POST -H "Content-Type: application/json" -d "{\"period\":1,\"numRank\":100,\"Address\":\"13KQh492C4V7ZeaVHkqoPxRS1fRpMrhqQB\",\"AuthSign\":\"HB1LqLgEOWKDMhXpFVND4VFdxAdYWSSx7kUpXsZwsFxTUGt1BqZnRbRfgx/9Fy6S3OkYMWDGhICo9t1dZWFdukFd6areoDbyb27n+GgOatti54GB91xxzN+UtRpFUfHL9Vxr88EvavJXncpRoa9k/VXulj5u2VzZ4GFLsnia8rI=\"}"
+```
+
+## 附
+以上，Address, AuthSign 需要从权限服务器获取：
+（这里不演示权限服务器的部署启动步骤）
+打开链接：
+http://192.168.199.130/trias-dag/#/
+找到右上角名字点击，进入后选择设置，选择地址和权限签名作为请求参数：
+![图片2](https://raw.githubusercontent.com/jdyuankai/document/master/StreamNet/images/pic_trias_privilege_gen_sk.jpg)
