@@ -1,0 +1,21 @@
+先由一个问题引出今天要讲述的主角。
+为了将spring.io新创建的代码提交到代码库，我采用了以下命令和操作步骤：
+1. 在github上创建新项目demo
+2. 本地使用spring.io新建项目demo
+3. 采用如下命令将本地库与远程库关联起来：
+```
+git init
+git add .
+git commit -m "init"
+git remote add origin https://github.com/sparky/demo.git
+git pull --rebase origin master
+git push --set-upstream origin master
+```
+有经验的同学马上就会发现问题，第四行不应该使用https协议而应该使用ssh协议。这就是我今天踩得坑。一开始这里使用https方式始终无法提交代码，
+后来修改为ssh方式后又没有把public key上传到github导致搞了半天。
+
+附一个公钥的生成方式：
+```
+$ssh-keygen -t rsa -C "email@email.com"
+```
+然后一路空格，生成公钥之后copy到github账号上。
